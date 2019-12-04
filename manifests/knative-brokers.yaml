@@ -1,0 +1,28 @@
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Broker
+metadata:
+  name: ci-builds
+  namespace: tekton-dream
+spec:
+  channelTemplateSpec:
+    apiVersion: messaging.knative.dev/v1alpha1
+    kind: InMemoryChannel
+---
+---
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: ulmaceae-event-listener
+  namespace: tekton-dream
+spec:
+  broker: ci-builds
+  filter:
+    attributes:
+      type: com.github.push
+      #      subject: frank
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1alpha1
+      kind: Service
+      name: ulmaceae-event-listener

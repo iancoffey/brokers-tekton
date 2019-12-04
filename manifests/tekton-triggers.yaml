@@ -1,0 +1,93 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: git-build-template
+  namespace: tekton-dream
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+    - name: namespace
+      description: The namespace to create the resources
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: source-repo-$(uid)
+        namespace: tekton-dream
+      spec:
+        type: git
+        params:
+        - name: revision
+          value: $(params.gitrevision)
+        - name: url
+          value: $(params.gitrepositoryurl)
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: image-source-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        type: image
+        params:
+          - name: url
+            value: DOCKERREPO-REPLACEME # docker-repo-location.com/repo:getting-started
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineResource
+      metadata:
+        name: event-to-sink-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        type: cloudEvent
+        params:
+          - name: targetURI
+            value: http://event-display.getting-started.svc.cluster.local
+    - apiVersion: tekton.dev/v1alpha1
+      kind: PipelineRun
+      metadata:
+        name: tekton-dream-pipeline-run-$(uid)
+        namespace: $(params.namespace)
+      spec:
+        serviceAccount: triggers-admin
+        pipelineRef:
+          name: tekton-dream-pipeline
+        resources:
+          - name: source-repo
+            resourceRef:
+              name: source-repo-$(uid)
+          - name: image-source
+            resourceRef:
+              name: image-source-$(uid)
+          - name: event-to-sink
+            resourceRef:
+              name: event-to-sink-$(uid)
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tekton-dream-pipelinebinding
+  namespace: tekton-dream
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: namespace
+      value: tekton-dream
+    - name: gitrepositoryurl
+      value: "https://github.com/$(body.repository.full_name)"
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: tekton-dream-listener
+  namespace: tekton-dream
+spec:
+  serviceAccountName: triggers-admin
+  triggers:
+    - bindings:
+      - name: tekton-dream-pipelinebinding
+      template:
+        name: tekton-dream-triggertemplate

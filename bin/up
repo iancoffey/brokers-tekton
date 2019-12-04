@@ -1,0 +1,29 @@
+#!/bin/sh
+
+PATH=$HOME/.gloo/bin:$PATH
+
+CLUSTER_NAME=tekton-dream
+
+# create kind cluster
+kind create cluster --name="$CLUSTER_NAME"
+
+# Set kubeconfig
+export KUBECONFIG="$(kind get kubeconfig-path --name="$CLUSTER_NAME")"
+
+# Install knative
+glooctl install knative --install-knative-version=0.10.0 --install-eventing-version=0.10.0 -e -k
+
+# Install Tekton Pipelines
+kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
+
+# Install Tekton Triggers
+kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+
+# Create our NS right up front
+kubectl create ns "$CLUSTER_NAME"
+
+# apply manifests
+kubectl apply --kubeconfig="$KUBECONFIG" -f manifests/
+
+# ready for actors?
+echo "Done! Time to create some events"
