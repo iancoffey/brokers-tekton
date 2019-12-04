@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: git-build-template
+  name: tekton-dream-triggertemplate
   namespace: tekton-dream
 spec:
   params:
@@ -87,7 +87,8 @@ metadata:
 spec:
   serviceAccountName: triggers-admin
   triggers:
-    - bindings:
+    - name: tekton-dram
+      bindings:
       - name: tekton-dream-pipelinebinding
       template:
         name: tekton-dream-triggertemplate
