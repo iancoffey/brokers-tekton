@@ -85,6 +85,7 @@ metadata:
   name: tekton-dream-listener
   namespace: tekton-dream
 spec:
+  ServiceType: LoadBalancer
   serviceAccountName: triggers-admin
   triggers:
     - name: tekton-dram

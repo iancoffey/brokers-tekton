@@ -17,7 +17,7 @@ kubectl apply --filename https://storage.googleapis.com/tekton-releases/triggers
 kubectl create ns "$CLUSTER_NAME"
 
 # apply manifests
-kubectl apply --kubeconfig="$KUBECONFIG" -f manifests/
+kubectl apply -f manifests/
 
 # ready for actors?
 echo "Done! Time to create some events"
