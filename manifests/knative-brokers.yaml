@@ -9,7 +9,6 @@ spec:
     apiVersion: messaging.knative.dev/v1alpha1
     kind: InMemoryChannel
 ---
----
 apiVersion: eventing.knative.dev/v1alpha1
 kind: Trigger
 metadata:
@@ -17,12 +16,13 @@ metadata:
   namespace: tekton-dream
 spec:
   broker: ci-builds
-  filter:
-    attributes:
-      type: com.github.push
-      #      subject: frank
+  #  filter:
+  #    attributes:
+  #      type: com.github.push
+  #      repo: iancoffey/ulmaceae
   subscriber:
     ref:
-      apiVersion: serving.knative.dev/v1alpha1
-      kind: Service
-      name: ulmaceae-event-listener
+      apiVersion: tekton.dev/v1alpha1
+      kind: EventListener
+      name: tekton-dream-listener
+      namespace: tekton-dream

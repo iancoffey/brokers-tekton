@@ -5,16 +5,15 @@ metadata:
   name: triggers
   namespace: tekton-dream
 rules:
-- apiGroups:
-    - sources.eventing.knative.dev
-  resources:
-  - containersources
-  verbs:
-  - get
-  - list
-  - create
-  - update
-  - delete
+- apiGroups: ["tekton.dev"]
+  resources: ["eventlisteners", "triggerbindings", "triggertemplates", "tasks", "taskruns"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["tekton.dev"]
+  resources: ["pipelineruns", "pipelineresources", "taskruns", "eventlisteners"]
+  verbs: ["create"]
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -34,3 +33,231 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: triggers
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eventing-broker-ingress
+  namespace: tekton-dream
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eventing-broker-filter
+  namespace: tekton-dream
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-broker-ingress
+  namespace: tekton-dream
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-ingress
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-broker-ingress
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-broker-filter
+  namespace: tekton-dream
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-filter
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-broker-filter
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-config-reader-default-eventing-broker-ingress
+  namespace: tekton-dream
+
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-ingress
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-config-reader-default-eventing-broker-filter
+  namespace: tekton-dream
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-filter
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-broker-filter
+  namespace: tekton-dream
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "eventing.knative.dev"
+    resources:
+      - "triggers"
+      - "triggers/status"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "tekton.dev"
+    resources:
+      - "eventlisteners"
+    verbs:
+      - "get"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-broker-ingress
+  namespace: tekton-dream
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-config-reader
+  namespace: tekton-dream
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-broker-filter
+  namespace: knative-eventing
+
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+  - apiGroups:
+      - "eventing.knative.dev"
+    resources:
+      - "triggers"
+      - "triggers/status"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-broker-ingress
+  namespace: knative-eventing
+
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: eventing-config-reader
+  namespace: knative-eventing
+  labels:
+    eventing.knative.dev/release: devel
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "configmaps"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-config-reader-default-eventing-broker-ingress
+  namespace: knative-eventing
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-ingress
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eventing-config-reader-default-eventing-broker-filter
+  namespace: knative-eventing
+subjects:
+  - kind: ServiceAccount
+    name: eventing-broker-filter
+    namespace: tekton-dream
+roleRef:
+  kind: ClusterRole
+  name: eventing-config-reader
+  apiGroup: rbac.authorization.k8s.io
+

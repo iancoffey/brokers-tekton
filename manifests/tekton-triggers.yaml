@@ -51,7 +51,7 @@ spec:
         name: tekton-dream-pipeline-run-$(uid)
         namespace: $(params.namespace)
       spec:
-        serviceAccount: triggers-admin
+        serviceAccountName: triggers-admin
         pipelineRef:
           name: tekton-dream-pipeline
         resources:
@@ -73,11 +73,11 @@ metadata:
 spec:
   params:
     - name: gitrevision
-      value: $(body.head_commit.id)
+      value: $(body.sha)
     - name: namespace
       value: tekton-dream
     - name: gitrepositoryurl
-      value: "https://github.com/$(body.repository.full_name)"
+      value: "https://github.com/$(body.repo)"
 ---
 apiVersion: tekton.dev/v1alpha1
 kind: EventListener
