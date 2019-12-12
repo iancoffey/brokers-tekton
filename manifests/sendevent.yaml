@@ -13,7 +13,7 @@ spec:
             - "--event-type"
             - "com.github.push"
             - "--source"
-            - "demo-folks"
+            - "iancoffey/ulmaceae"
             - "--data"
             - "{\"repo\": \"iancoffey/ulmaceae\", \"sha\": \"6c81db31fcebb28cd60af3c715f83ad6d5a81d50\"}"
   sink:

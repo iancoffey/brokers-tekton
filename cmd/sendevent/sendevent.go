@@ -15,6 +15,9 @@ limitations under the License.
 */
 
 // Implements a simple utility for sending a JSON-encoded sample event.
+
+// 12/1/19 - icoffey updated this to properly accept sink argument
+
 package main
 
 import (
@@ -95,4 +98,5 @@ func main() {
 	} else if resp != nil {
 		fmt.Printf("Got response from %s\n%s\n", sink, resp)
 	}
+	log.Println("Successfully sent Cloudevent")
 }

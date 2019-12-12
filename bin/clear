@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Just delete everything so we can start anew!
+
+kubectl delete pipelineruns --all -n tekton-dream
+
+kubectl delete pipelineresources --all -n tekton-dream
+
+kubectl delete containersources --all -n tekton-dream

@@ -5,15 +5,42 @@ metadata:
   name: triggers
   namespace: tekton-dream
 rules:
-- apiGroups: ["tekton.dev"]
-  resources: ["eventlisteners", "triggerbindings", "triggertemplates", "tasks", "taskruns"]
-  verbs: ["get"]
-- apiGroups: [""]
-  resources: ["configmaps"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: ["tekton.dev"]
-  resources: ["pipelineruns", "pipelineresources", "taskruns", "eventlisteners"]
-  verbs: ["create"]
+- apiGroups:
+  - tekton.dev
+  resources:
+  - eventlisteners
+  - triggerbindings
+  - triggertemplates
+  - tasks
+  - taskruns
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - tekton.dev
+  resources:
+  - pipelineruns
+  - pipelineresources
+  - taskruns
+  - eventlisteners
+  verbs:
+  - create
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - create
 ---
 apiVersion: v1
 kind: ServiceAccount

@@ -4,8 +4,15 @@ PATH=$HOME/.gloo/bin:$PATH
 
 CLUSTER_NAME=tekton-dream
 
+export KUBECONFIG="$(kind get kubeconfig-path --name="$CLUSTER_NAME")"
+
 # Install knative
 glooctl install knative --install-knative-version=0.10.0 --install-eventing-version=0.10.0 -e -k
+
+# Update knative to latest release
+kubectl apply --filename https://github.com/knative/serving/releases/download/v0.10.0/serving.yaml \
+--filename https://github.com/knative/eventing/releases/download/v0.10.0/release.yaml \
+--filename https://github.com/knative/serving/releases/download/v0.10.0/monitoring.yaml
 
 # Install Tekton Pipelines
 kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml

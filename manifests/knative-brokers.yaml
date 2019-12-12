@@ -16,10 +16,10 @@ metadata:
   namespace: tekton-dream
 spec:
   broker: ci-builds
-  #  filter:
-  #    attributes:
-  #      type: com.github.push
-  #      repo: iancoffey/ulmaceae
+  filter:
+    attributes:
+      type: com.github.push
+      #      source: iancoffey/ulmaceae
   subscriber:
     ref:
       apiVersion: tekton.dev/v1alpha1
