@@ -1,4 +1,4 @@
-# brokers-tekton
+# Tekton Triggers + Knative Eventing = <3
 
 This repository contains an example system that links `Knative Brokers` to `Tekton Triggers` to spawn Pipelines to demo this powerful pattern and have some fun, too.
 
